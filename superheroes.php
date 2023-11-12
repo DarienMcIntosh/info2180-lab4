@@ -63,10 +63,29 @@ $superheroes = [
   ], 
 ];
 
-?>
+$query = isset($_GET['query']) ? $_GET['query'] : '';
 
-<ul>
-<?php foreach ($superheroes as $superhero): ?>
-  <li><?= $superhero['alias']; ?></li>
-<?php endforeach; ?>
-</ul>
+if (!empty($query)) {
+    // Search for a specific superhero by name or alias
+    $result = searchSuperhero($superheroes, $query);
+} else {
+    // Return the original list of superheroes
+    $result = $superheroes;
+}
+
+// Output the result as JSON
+header('Content-Type: application/json');
+echo json_encode($result);
+
+function searchSuperhero($superheroes, $query) {
+    foreach ($superheroes as $superhero) {
+        // Case-insensitive search
+        if (strcasecmp($superhero['name'], $query) === 0 || strcasecmp($superhero['alias'], $query) === 0) {
+            return $superhero;
+        }
+    }
+
+    // If no superhero is found, return an array with a message
+    return ["message" => "Superhero not found"];
+}
+?>
